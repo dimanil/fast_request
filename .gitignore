@@ -1,0 +1,11 @@
+*.svg
+*.jpeg
+*.jpg
+*.ndjson
+*.egg
+*.so
+*.pyd
+__pycache__/
+.ionide/
+*.c.o
+*.pyc

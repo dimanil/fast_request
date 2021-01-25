@@ -1,0 +1,39 @@
+name: Upload to PYPI 🐍
+
+#on: [push]
+on:
+  release:
+    types: [created]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1
+    - uses: jiro4989/setup-nim-action@v1.0.2
+      with:
+        nim-version: '1.2.4'
+
+    - name: Set Global Environment Variables
+      uses: allenevans/set-env@v1.0.0
+      with:
+        TWINE_NON_INTERACTIVE: 1
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        MAIN_MODULE: "faster_than_requests.nim"
+        #TWINE_REPOSITORY_URL: "https://test.pypi.org/legacy/"
+        #TWINE_REPOSITORY: "https://test.pypi.org/legacy/"
+
+    - name: Update Python PIP
+      run: pip3 install --upgrade --disable-pip-version-check pip setuptools twine
+
+    - name: Prepare Files
+      run: |
+        mkdir --verbose --parents dist/
+        rm --verbose --force --recursive dist/*.zip
+
+    - name: Publish to PYPI
+      run: |
+        python3 setup.py --verbose sdist --formats=zip
+        twine upload --verbose --disable-progress-bar dist/*.zip
